@@ -4,4 +4,6 @@
 
     using flag package
 
-2. Search Java class file
+2. Search Java Class File
+
+    using composite pattern
