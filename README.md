@@ -7,3 +7,7 @@
 2. Search Java Class File
 
     using composite pattern
+
+3. Resolve Java Class File
+
+    
