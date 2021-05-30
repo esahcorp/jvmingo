@@ -9,5 +9,16 @@
     using composite pattern
 
 3. Resolve Java Class File
+   
+   BigEndian bytecode
+
+   Constant Pool
+
+   Attributes
+
+4. Run-Time data area
+
+   * Thread private
+   * Thread share
 
     
