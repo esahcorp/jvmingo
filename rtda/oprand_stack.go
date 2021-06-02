@@ -21,7 +21,7 @@ func (os *OperandStack) PushInt(val int32) {
 	os.size++
 }
 
-func (os OperandStack) PopInt() int32 {
+func (os *OperandStack) PopInt() int32 {
 	os.size--
 	return os.slots[os.size].num
 }
@@ -71,4 +71,14 @@ func (os *OperandStack) PopRef() *Object {
 	ref := os.slots[os.size].ref
 	os.slots[os.size].ref = nil // Remove ref for GC
 	return ref
+}
+
+func (os *OperandStack) PushSlot(slot Slot) {
+	os.slots[os.size] = slot
+	os.size++
+}
+
+func (os *OperandStack) PopSlot() Slot {
+	os.size--
+	return os.slots[os.size]
 }

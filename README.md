@@ -20,5 +20,9 @@
 
    * Thread private
    * Thread share
+   
+5. Instructions Set
 
-    
+   Using interface for instruction abstract
+
+   `FetchOperands` `Execute` methods are suit for all instructions 

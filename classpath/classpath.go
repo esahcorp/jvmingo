@@ -1,7 +1,6 @@
 package classpath
 
 import (
-	"fmt"
 	"os"
 	"path/filepath"
 )
@@ -26,8 +25,6 @@ func (classpath *Classpath) ReadClass(className string) ([]byte, Entry, error) {
 	className = className + ".class"
 	if data, entry, err := classpath.bootClasspath.readClass(className); err == nil {
 		return data, entry, nil
-	} else {
-		fmt.Printf("err: %v\n", err)
 	}
 
 	if data, entry, err := classpath.extClasspath.readClass(className); err == nil {
