@@ -1,5 +1,7 @@
 package rtda
 
+import "jvmingo/rtda/heap"
+
 /* JVM Stack Frame */
 
 type Frame struct {
@@ -7,7 +9,12 @@ type Frame struct {
 	localVars    LocalVars
 	operandStack *OperandStack
 	thread       *Thread
+	method       *heap.Method
 	nextPC       int
+}
+
+func (f *Frame) Method() *heap.Method {
+	return f.method
 }
 
 func (f *Frame) NextPC() int {
@@ -30,10 +37,11 @@ func (f *Frame) OperandStack() *OperandStack {
 	return f.operandStack
 }
 
-func newFrame(thread *Thread, maxLocals, maxStack uint) *Frame {
+func newFrame(thread *Thread, method *heap.Method) *Frame {
 	return &Frame{
 		thread:       thread,
-		localVars:    newLocalVars(maxLocals),
-		operandStack: newOperandStack(maxStack),
+		method:       method,
+		localVars:    newLocalVars(method.MaxLocals()),
+		operandStack: newOperandStack(method.MaxStack()),
 	}
 }

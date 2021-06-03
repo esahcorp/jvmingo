@@ -26,3 +26,8 @@
    Using interface for instruction abstract
 
    `FetchOperands` `Execute` methods are suit for all instructions 
+
+6. Class and Object
+   
+   1. load class information into  method area
+   2. implement classloader

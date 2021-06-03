@@ -2,26 +2,24 @@ package main
 
 import (
 	"fmt"
-	"jvmingo/classfile"
 	"jvmingo/instructions"
 	"jvmingo/instructions/base"
 	"jvmingo/rtda"
+	"jvmingo/rtda/heap"
 )
 
 // Interpreter method
 
-func interpret(info *classfile.MemberInfo) {
-	codeAttr := info.CodeAttribute()
-	maxLocal := codeAttr.MaxLocal()
-	maxStack := codeAttr.MaxStack()
-	bytecode := codeAttr.Code()
+func interpret(method *heap.Method) {
+
+	fmt.Printf("执行 %s 方法\n", method.Name())
 
 	thread := rtda.NewThread()
-	frame := thread.NewFrame(maxLocal, maxStack)
+	frame := thread.NewFrame(method)
 	thread.PushFrame(frame)
 
 	defer catchErr(frame)
-	loop(thread, bytecode)
+	loop(thread, method.Code())
 }
 
 func loop(thread *rtda.Thread, bytecode []byte) {
@@ -32,12 +30,14 @@ func loop(thread *rtda.Thread, bytecode []byte) {
 		pc := frame.NextPC()
 		thread.SetPC(pc)
 
+		// decode
 		reader.Reset(bytecode, pc)
 		opcode := reader.ReadUint8()
 		inst := instructions.NewInstruction(opcode)
 		inst.FetchOperands(reader)
 		frame.SetNextPC(reader.PC())
 
+		// execute
 		fmt.Printf("pc:%2d inst:%T %v\n", pc, inst, inst)
 		inst.Execute(frame)
 	}

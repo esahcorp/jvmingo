@@ -37,6 +37,7 @@ func Parse(classData []byte) (cf *ClassFile, err error) {
 func (cf *ClassFile) read(reader *ClassReader) {
 	cf.readAndCheckMagic(reader)
 	cf.readAndCheckVersion(reader)
+	// 常量池
 	cf.constantPool = readConstantPool(reader)
 	cf.accessFlags = reader.readUint16()
 	cf.thisClass = reader.readUint16()
@@ -45,6 +46,7 @@ func (cf *ClassFile) read(reader *ClassReader) {
 	cf.interfaces = reader.readUint16s()
 	cf.fields = readMembers(reader, cf.constantPool)
 	cf.methods = readMembers(reader, cf.constantPool)
+	// 类有 Attribute 字段和方法也有 Attribute
 	cf.attributes = readAttributes(reader, cf.constantPool)
 }
 

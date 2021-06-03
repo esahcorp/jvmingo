@@ -1,5 +1,7 @@
 package rtda
 
+import "jvmingo/rtda/heap"
+
 /* Java thread private memory area */
 
 type Thread struct {
@@ -31,7 +33,6 @@ func (t *Thread) CurrentFrame() *Frame {
 	return t.stack.top()
 }
 
-func (t *Thread) NewFrame(maxLocals, maxStack uint) *Frame {
-	return newFrame(t, maxLocals, maxStack)
-
+func (t *Thread) NewFrame(method *heap.Method) *Frame {
+	return newFrame(t, method)
 }

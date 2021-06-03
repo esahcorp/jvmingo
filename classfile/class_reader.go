@@ -2,6 +2,8 @@ package classfile
 
 import "encoding/binary"
 
+// 按顺序边读边切片，不需要 index
+
 type ClassReader struct {
 	data []byte
 }

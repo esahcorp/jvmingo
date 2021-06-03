@@ -1,6 +1,9 @@
 package rtda
 
-import "math"
+import (
+	"jvmingo/rtda/heap"
+	"math"
+)
 
 /* Operand Stack of JVM Stack */
 
@@ -61,12 +64,12 @@ func (os *OperandStack) PopDouble() float64 {
 	return math.Float64frombits(bits)
 }
 
-func (os *OperandStack) PushRef(ref *Object) {
+func (os *OperandStack) PushRef(ref *heap.Object) {
 	os.slots[os.size].ref = ref
 	os.size++
 }
 
-func (os *OperandStack) PopRef() *Object {
+func (os *OperandStack) PopRef() *heap.Object {
 	os.size--
 	ref := os.slots[os.size].ref
 	os.slots[os.size].ref = nil // Remove ref for GC

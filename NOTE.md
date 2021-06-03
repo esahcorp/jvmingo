@@ -71,3 +71,5 @@ struct cp_info {
 ```
 
 3.4 magic number 是格式的一种惯例，非 Java 独有
+
+6.1 2 的幂彼此之间位与运算，除非相同，否则为 0

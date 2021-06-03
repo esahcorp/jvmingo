@@ -1,9 +1,12 @@
 package rtda
 
-import "testing"
+import (
+	"jvmingo/rtda/heap"
+	"testing"
+)
 
 func TestFrame(t *testing.T) {
-	frame := newFrame(100, 100)
+	frame := newFrame(NewThread(), &heap.Method{})
 	testLocalVars(frame.localVars, t)
 	testOperandStack(frame.operandStack, t)
 }
