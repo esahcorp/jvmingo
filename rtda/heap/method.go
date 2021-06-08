@@ -4,9 +4,14 @@ import "jvmingo/classfile"
 
 type Method struct {
 	ClassMember
-	maxStack  uint
-	maxLocals uint
-	code      []byte
+	maxStack     uint
+	maxLocals    uint
+	code         []byte
+	argSlotCount uint
+}
+
+func (m *Method) ArgSlotCount() uint {
+	return m.argSlotCount
 }
 
 func (m *Method) MaxStack() uint {
@@ -28,6 +33,7 @@ func newMethods(class *Class, cfMethods []*classfile.MemberInfo) []*Method {
 		methods[i].class = class
 		methods[i].copyMemberInfo(cfMethod)
 		methods[i].copyAttributes(cfMethod)
+		methods[i].calcArgSlotCount()
 	}
 	return methods
 }
@@ -57,4 +63,17 @@ func (m *Method) IsAbstract() bool {
 }
 func (m *Method) IsStrict() bool {
 	return 0 != m.accessFlags&ACC_STRICT
+}
+
+func (m *Method) calcArgSlotCount() {
+	descriptor := parseMethodDescriptor(m.descriptor)
+	for _, paramType := range descriptor.parameterTypes {
+		m.argSlotCount++
+		if paramType == "J" || paramType == "D" {
+			m.argSlotCount++
+		}
+	}
+	if !m.IsStatic() {
+		m.argSlotCount++ // `this` reference
+	}
 }

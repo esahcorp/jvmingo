@@ -8,7 +8,7 @@ import (
 /* Operand Stack of JVM Stack */
 
 type OperandStack struct {
-	size  int
+	size  uint
 	slots []Slot
 }
 
@@ -84,4 +84,8 @@ func (os *OperandStack) PushSlot(slot Slot) {
 func (os *OperandStack) PopSlot() Slot {
 	os.size--
 	return os.slots[os.size]
+}
+
+func (os *OperandStack) GetRefFromTop(n uint) *heap.Object {
+	return os.slots[os.size-1-n].ref
 }

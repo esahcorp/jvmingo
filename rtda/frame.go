@@ -37,6 +37,12 @@ func (f *Frame) OperandStack() *OperandStack {
 	return f.operandStack
 }
 
+// NextPC 指向当前 PC
+
+func (f *Frame) RevertNextPC() {
+	f.nextPC = f.thread.pc
+}
+
 func newFrame(thread *Thread, method *heap.Method) *Frame {
 	return &Frame{
 		thread:       thread,

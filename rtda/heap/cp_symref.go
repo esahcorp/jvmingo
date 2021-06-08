@@ -14,10 +14,10 @@ func (sr *SymRef) ResolvedClass() *Class {
 }
 
 func (sr *SymRef) resolveClassRef() {
-	d := sr.cp.class
-	c := d.loader.LoadClass(sr.className)
-	if !c.isAccessibleTo(d) {
+	visitor := sr.cp.class
+	owner := visitor.loader.LoadClass(sr.className)
+	if !owner.isAccessibleTo(visitor) {
 		panic("java.lang.IllegalAccessError")
 	}
-	sr.class = c
+	sr.class = owner
 }

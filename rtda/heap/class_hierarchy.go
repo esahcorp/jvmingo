@@ -8,13 +8,13 @@ func (class *Class) isAssignableFrom(other *Class) bool {
 		return true
 	}
 	if !t.IsInterface() {
-		return s.isSubClassOf(t)
+		return s.IsSubClassOf(t)
 	} else {
-		return s.isImplements(t)
+		return s.IsImplements(t)
 	}
 }
 
-func (class *Class) isSubClassOf(other *Class) bool {
+func (class *Class) IsSubClassOf(other *Class) bool {
 	for c := class.superClass; c != nil; c = c.superClass {
 		if c == other {
 			return true
@@ -23,7 +23,7 @@ func (class *Class) isSubClassOf(other *Class) bool {
 	return false
 }
 
-func (class *Class) isImplements(iface *Class) bool {
+func (class *Class) IsImplements(iface *Class) bool {
 	for c := class; c != nil; c = c.superClass {
 		for _, i := range c.interfaces {
 			if i == iface || i.isSubInterfaceOf(iface) {
@@ -41,4 +41,8 @@ func (class *Class) isSubInterfaceOf(iface *Class) bool {
 		}
 	}
 	return false
+}
+
+func (class *Class) IsSuperClassOf(other *Class) bool {
+	return other.IsSubClassOf(class)
 }
