@@ -24,32 +24,7 @@ type Class struct {
 	initStarted       bool  // 类初始化标志
 }
 
-func (class *Class) InitStarted() bool {
-	return class.initStarted
-}
-
-func (class *Class) StartInit() {
-	class.initStarted = true
-}
-
-func (class *Class) Name() string {
-	return class.name
-}
-
-func (class *Class) SuperClass() *Class {
-	return class.superClass
-}
-
-func (class *Class) ConstantPool() *ConstantPool {
-	return class.constantPool
-}
-
-func (class *Class) StaticVars() Slots {
-	return class.staticVars
-}
-
 // Convert ClassFile to Class
-
 func newClass(cf *classfile.ClassFile) *Class {
 	class := new(Class)
 	class.accessFlags = cf.AccessFlags()
@@ -87,6 +62,37 @@ func (class *Class) IsEnum() bool {
 	return 0 != class.accessFlags&ACC_ENUM
 }
 
+// getter
+
+func (class *Class) Name() string {
+	return class.name
+}
+func (class *Class) ConstantPool() *ConstantPool {
+	return class.constantPool
+}
+func (class *Class) Loader() *ClassLoader {
+	return class.loader
+}
+func (class *Class) Fields() []*Field {
+	return class.fields
+}
+func (class *Class) Methods() []*Method {
+	return class.methods
+}
+func (class *Class) SuperClass() *Class {
+	return class.superClass
+}
+func (class *Class) StaticVars() Slots {
+	return class.staticVars
+}
+func (class *Class) InitStarted() bool {
+	return class.initStarted
+}
+
+func (class *Class) StartInit() {
+	class.initStarted = true
+}
+
 func (class *Class) isAccessibleTo(other *Class) bool {
 	return class.IsPublic() || class.GetPackageName() == other.GetPackageName()
 }
@@ -98,12 +104,12 @@ func (class *Class) GetPackageName() string {
 	return ""
 }
 
-func (class *Class) NewObject() *Object {
-	return newObject(class)
-}
-
 func (class *Class) GetMainMethod() *Method {
 	return class.getStaticMethod("main", "([Ljava/lang/String;)V")
+}
+
+func (class *Class) GetClinitMethod() *Method {
+	return class.getStaticMethod("<clinit>", "()V")
 }
 
 func (class *Class) getStaticMethod(name, descriptor string) *Method {
@@ -116,6 +122,51 @@ func (class *Class) getStaticMethod(name, descriptor string) *Method {
 	return nil
 }
 
-func (class *Class) GetClinitMethod() *Method {
-	return class.getStaticMethod("<clinit>", "()V")
+func (class *Class) getMethod(name, descriptor string, isStatic bool) *Method {
+	for c := class; c != nil; c = c.superClass {
+		for _, method := range c.methods {
+			if method.IsStatic() == isStatic &&
+				method.name == name &&
+				method.descriptor == descriptor {
+
+				return method
+			}
+		}
+	}
+	return nil
+}
+
+func (class *Class) getField(name, descriptor string, isStatic bool) *Field {
+	for c := class; c != nil; c = c.superClass {
+		for _, field := range c.fields {
+			if field.IsStatic() == isStatic &&
+				field.name == name &&
+				field.descriptor == descriptor {
+
+				return field
+			}
+		}
+	}
+	return nil
+}
+
+func (class *Class) isJlObject() bool {
+	return class.name == "java/lang/Object"
+}
+
+func (class *Class) isJlCloneable() bool {
+	return class.name == "java/lang/Cloneable"
+}
+
+func (class *Class) isJlSerializable() bool {
+	return class.name == "java/io/Serializable"
+}
+
+func (class *Class) NewObject() *Object {
+	return newObject(class)
+}
+
+func (class *Class) ArrayClass() *Class {
+	arrayClassName := getArrayClassName(class.name)
+	return class.loader.LoadClass(arrayClassName)
 }

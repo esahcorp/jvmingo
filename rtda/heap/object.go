@@ -3,25 +3,25 @@ package heap
 /* Java Object */
 
 type Object struct {
-	class  *Class
-	fields Slots // 示例变量值，静态变量在类变量里面
+	class *Class
+	data  interface{} // 实例变量，包括数组，静态变量在类变量里面
 }
 
-func (o *Object) Class() *Class {
-	return o.class
+func (obj *Object) Class() *Class {
+	return obj.class
 }
 
-func (o *Object) Fields() Slots {
-	return o.fields
+func (obj *Object) Fields() Slots {
+	return obj.data.(Slots)
 }
 
-func (o *Object) IsInstanceOf(class *Class) bool {
-	return class.isAssignableFrom(o.class)
+func (obj *Object) IsInstanceOf(class *Class) bool {
+	return class.isAssignableFrom(obj.class)
 }
 
 func newObject(class *Class) *Object {
 	return &Object{
-		class:  class,
-		fields: newSlots(class.instanceSlotCount),
+		class: class,
+		data:  newSlots(class.instanceSlotCount),
 	}
 }
