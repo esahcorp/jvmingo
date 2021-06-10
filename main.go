@@ -29,7 +29,7 @@ func startJVM(cmd *Cmd) {
 	// 目前只能解析 main 方法
 
 	if mainMethod != nil {
-		interpret(mainMethod, cmd.verboseInstFlag)
+		interpret(mainMethod, cmd.verboseInstFlag, cmd.args)
 	} else {
 		fmt.Printf("Main method not found in class %s\n ", cmd.class)
 	}
