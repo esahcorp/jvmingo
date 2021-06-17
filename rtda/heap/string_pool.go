@@ -33,3 +33,12 @@ func stringToUtf16(str string) []uint16 {
 	runes := []rune(str)
 	return utf16.Encode(runes)
 }
+
+func InternString(jStr *Object) *Object {
+	goStr := GoString(jStr)
+	if internStr, ok := internedStrings[goStr]; ok {
+		return internStr
+	}
+	internedStrings[goStr] = jStr
+	return jStr
+}

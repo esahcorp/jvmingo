@@ -63,6 +63,11 @@ func (class *Class) IsAnnotation() bool {
 func (class *Class) IsEnum() bool {
 	return 0 != class.accessFlags&ACC_ENUM
 }
+func (class *Class) IsPrimitive() bool {
+	_, ok := primitiveTypes[class.name]
+	return ok
+}
+
 func (class *Class) Name() string {
 	return class.name
 }
@@ -178,4 +183,17 @@ func (class *Class) ArrayClass() *Class {
 
 func (class *Class) JavaName() string {
 	return strings.Replace(class.name, "/", ".", -1)
+}
+
+func (class *Class) GetInstanceMethod(name, descriptor string) *Method {
+	return class.getMethod(name, descriptor, false)
+}
+
+func (class *Class) GetRefVar(fieldName, fieldDescriptor string) *Object {
+	field := class.getField(fieldName, fieldDescriptor, true)
+	return class.staticVars.GetRef(field.slotId)
+}
+func (class *Class) SetRefVar(fieldName, fieldDescriptor string, ref *Object) {
+	field := class.getField(fieldName, fieldDescriptor, true)
+	class.staticVars.SetRef(field.slotId, ref)
 }

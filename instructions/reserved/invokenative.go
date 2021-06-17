@@ -4,6 +4,7 @@ import (
 	"jvmingo/instructions/base"
 	"jvmingo/native"
 	_ "jvmingo/native/java/lang"
+	_ "jvmingo/native/sun/misc"
 	"jvmingo/rtda"
 )
 
