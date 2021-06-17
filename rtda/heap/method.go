@@ -29,13 +29,23 @@ func (m *Method) Code() []byte {
 func newMethods(class *Class, cfMethods []*classfile.MemberInfo) []*Method {
 	methods := make([]*Method, len(cfMethods))
 	for i, cfMethod := range cfMethods {
-		methods[i] = &Method{}
-		methods[i].class = class
-		methods[i].copyMemberInfo(cfMethod)
-		methods[i].copyAttributes(cfMethod)
-		methods[i].calcArgSlotCount()
+		methods[i] = newMethod(class, cfMethod)
 	}
 	return methods
+}
+
+func newMethod(class *Class, cfMethod *classfile.MemberInfo) *Method {
+	method := &Method{}
+	method.class = class
+	method.copyMemberInfo(cfMethod)
+	method.copyAttributes(cfMethod)
+	md := parseMethodDescriptor(method.descriptor)
+	method.calcArgSlotCount(md.parameterTypes)
+	if method.IsNative() {
+		method.injectCodeAttribute(md.returnType)
+	}
+
+	return method
 }
 
 func (m *Method) copyAttributes(cfMethod *classfile.MemberInfo) {
@@ -43,6 +53,25 @@ func (m *Method) copyAttributes(cfMethod *classfile.MemberInfo) {
 		m.maxStack = codeAttr.MaxStack()
 		m.maxLocals = codeAttr.MaxLocals()
 		m.code = codeAttr.Code()
+	}
+}
+
+func (m *Method) injectCodeAttribute(returnType string) {
+	m.maxStack = 4
+	m.maxLocals = m.argSlotCount
+	switch returnType[0] {
+	case 'V':
+		m.code = []byte{0xfe, 0xb1} // return
+	case 'D':
+		m.code = []byte{0xfe, 0xaf} // dreturn
+	case 'F':
+		m.code = []byte{0xfe, 0xae} // freturn
+	case 'J':
+		m.code = []byte{0xfe, 0xad} // lreturn
+	case 'L', '[':
+		m.code = []byte{0xfe, 0xb0} // areturn
+	default:
+		m.code = []byte{0xfe, 0xac} // ireturn
 	}
 }
 
@@ -65,9 +94,8 @@ func (m *Method) IsStrict() bool {
 	return 0 != m.accessFlags&ACC_STRICT
 }
 
-func (m *Method) calcArgSlotCount() {
-	descriptor := parseMethodDescriptor(m.descriptor)
-	for _, paramType := range descriptor.parameterTypes {
+func (m *Method) calcArgSlotCount(paramTypes []string) {
+	for _, paramType := range paramTypes {
 		m.argSlotCount++
 		if paramType == "J" || paramType == "D" {
 			m.argSlotCount++

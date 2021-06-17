@@ -5,6 +5,15 @@ package heap
 type Object struct {
 	class *Class
 	data  interface{} // 实例变量，包括数组，静态变量在类变量里面
+	extra interface{}
+}
+
+func (obj *Object) Extra() interface{} {
+	return obj.extra
+}
+
+func (obj *Object) SetExtra(extra interface{}) {
+	obj.extra = extra
 }
 
 func (obj *Object) Class() *Class {

@@ -18,10 +18,11 @@ type Class struct {
 	loader            *ClassLoader
 	superClass        *Class
 	interfaces        []*Class
-	instanceSlotCount uint  // 示例变量占用空间大小
-	staticSlotCount   uint  // 静态变量占用空间大小
-	staticVars        Slots // 静态变量值
-	initStarted       bool  // 类初始化标志
+	instanceSlotCount uint    // 示例变量占用空间大小
+	staticSlotCount   uint    // 静态变量占用空间大小
+	staticVars        Slots   // 静态变量值
+	initStarted       bool    // 类初始化标志
+	jClass            *Object // java.lang.Class 实例
 }
 
 // Convert ClassFile to Class
@@ -40,6 +41,7 @@ func newClass(cf *classfile.ClassFile) *Class {
 func (class *Class) IsPublic() bool {
 	return 0 != class.accessFlags&ACC_PUBLIC
 }
+
 func (class *Class) IsFinal() bool {
 	return 0 != class.accessFlags&ACC_FINAL
 }
@@ -61,12 +63,12 @@ func (class *Class) IsAnnotation() bool {
 func (class *Class) IsEnum() bool {
 	return 0 != class.accessFlags&ACC_ENUM
 }
-
-// getter
-
 func (class *Class) Name() string {
 	return class.name
 }
+
+// getter
+
 func (class *Class) ConstantPool() *ConstantPool {
 	return class.constantPool
 }
@@ -84,6 +86,9 @@ func (class *Class) SuperClass() *Class {
 }
 func (class *Class) StaticVars() Slots {
 	return class.staticVars
+}
+func (class *Class) JClass() *Object {
+	return class.jClass
 }
 func (class *Class) InitStarted() bool {
 	return class.initStarted
@@ -169,4 +174,8 @@ func (class *Class) NewObject() *Object {
 func (class *Class) ArrayClass() *Class {
 	arrayClassName := getArrayClassName(class.name)
 	return class.loader.LoadClass(arrayClassName)
+}
+
+func (class *Class) JavaName() string {
+	return strings.Replace(class.name, "/", ".", -1)
 }
